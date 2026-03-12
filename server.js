@@ -1,18 +1,128 @@
+//initialise .env to save sensitive data
 require ('dotenv').config();
 //import expressjs
 const express = require('express');
+//intialise the database(mongodb)                                                                                                                                                                                                       
+const mongoose = require('mongoose')
+//initialise the JWT
+const jwt = require ('jsonwebtoken')
+//initialise database user model
+const User =require('./models/User')
 //initialise the server
 const app = express();
+//initialise the password encryptor
+const bcrypt = require ('bcryptjs');
+//activate JSON reading capability
+app.use(express.json());
 //Server initial communication
 app.get ('/',((req,res)=>{ 
     res.send("Welcome to the Netisens LMS Backend server!, The server is live.");
     })
         );
+app.post('/register',async(req,res) =>{
+    try{
+        //  Grab the data the student sent us
+        const {name, email, password} = req.body;
+        // Salt the password
+        const salt = await bcrypt.genSalt(10);
+        // mix the salt with the password
+        const hashedpassword = await bcrypt.hash(password,salt);
+        //  Feed it to build a new User
+        const student = new User({
+            name:name,
+            email:email,
+            password:hashedpassword,
+        });
+        // Save to database
+        await student.save();
+        // Send a success text back to the student
+        res.send("Student succesfully registered in the LMS!")
+    }
+    catch(error){
+        //If email is missing or there is an error, it catches and displays it
+        console.error("There is an error:", error);
+        res.status(400).send("Registration failed. The email might already exist.");
+    }
+});
+// The VIP Bouncer (Middleware)
+const verifyToken = (req, res, next) => {
+    // 1. Look at the user's header for the wristband
+    const token = req.header('Authorization');
+    
+    // 2. If they don't have one, kick them out
+    if (!token) {
+        return res.status(401).send("Access Denied. No ID Badge provided.");
+    }
+
+    try {
+        // 3. Check the math on the badge (Verify the signature)
+        // We use replace() to strip away the word "Bearer " that usually comes with tokens
+        const cleanToken = token.replace("Bearer ", "");
+        const verified = jwt.verify(cleanToken, process.env.JWT_SECRET);
+        
+        // 4. If it's real, attach the user's payload to the request and let them pass!
+        req.user = verified; 
+        next(); 
+        
+    } catch (error) {
+        // If the token is fake or expired, kick them out
+        res.status(400).send("Invalid or expired token.");
+    }
+};
+// Generic User Login Route
+app.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Check the ID (Find the user by email)
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(400).send("User not found. Please register first.");
+        }
+
+        // 2. Check the Handshake (Compare passwords)
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).send("Incorrect password.");
+        }
+        // 3. Success! Print the ID Badge (JWT)
+        const token = jwt.sign(
+            { userId: user._id, role: user.role }, // The Payload (Who is this?)
+            process.env.JWT_SECRET,                // The Signature (The wax seal)
+            { expiresIn: '30d' }                   // The Clock (Expires in 30 days)
+        );
+
+        // Hand the badge back to the user in a nice JSON package
+        res.status(200).json({
+            message: `Welcome back, ${user.name}!`,
+            token: token
+        });
+
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).send("Server error during login.");
+    }
+});
+// A Protected Route (Only logged-in users can see this)
+app.get('/dashboard', verifyToken, (req, res) => {
+    // Because the Bouncer let them pass, we now have access to req.user!
+    res.send(`Welcome to the VIP Lounge! Your hidden user ID is ${req.user.userId} and your role is ${req.user.role}.`);
+});
 //Port Configuration
 const port =  process.env.port || 5000;
+const dbstring = process.env.MONGO_URI;
+mongoose.connect(dbstring)
+        .then(()=>{
+            console.log("Succesfully Connected to the Mongodb database");
+        })
+        .catch((error) =>{
+            console.error("Failed to connect to the database, Error:", error);
+        })
+
 app.listen (port,(()=>{
     console.log(`The port is running and listening on port ${port}`);
 
     })  
 
         );
+        
