@@ -14,11 +14,9 @@ const app = express();
 const bcrypt = require ('bcryptjs');
 //activate JSON reading capability
 app.use(express.json());
-//Server initial communication
-app.get ('/',((req,res)=>{ 
-    res.send("Welcome to the Netisens LMS Backend server!, The server is live.");
-    })
-        );
+//make sure public information is accessible to even non users
+app.use(express.static('public'))
+
 app.post('/register',async(req,res) =>{
     try{
         //  Grab the data the student sent us
@@ -37,7 +35,7 @@ app.post('/register',async(req,res) =>{
         await student.save();
         // Send a success text back to the student
         res.send("Student succesfully registered in the LMS!")
-    }
+    } 
     catch(error){
         //If email is missing or there is an error, it catches and displays it
         console.error("There is an error:", error);
