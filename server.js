@@ -8,6 +8,9 @@ const mongoose = require('mongoose')
 const jwt = require ('jsonwebtoken')
 //initialise database user model
 const User =require('./models/User')
+//initialise course information
+const Course = require('./models/Course');
+
 //initialise the server
 const app = express();
 //initialise the password encryptor
@@ -17,7 +20,7 @@ app.use(express.json());
 //make sure public information is accessible to even non users
 app.use(express.static('public'))
 
-app.post('/register',async(req,res) =>{
+  app.post('/register',async(req,res) =>{
     try{
         //  Grab the data the student sent us
         const {name, email, password} = req.body;
@@ -116,6 +119,27 @@ mongoose.connect(dbstring)
         .catch((error) =>{
             console.error("Failed to connect to the database, Error:", error);
         })
+// ==========================================
+// ADMIN ROUTE: UPLOAD A COURSE
+// ==========================================
+app.post('/courses', async (req, res) => {
+    try {
+        const { courseCode, title, instructor, materialLink } = req.body;
+
+        const newCourse = new Course({
+            courseCode: courseCode,
+            title: title,
+            instructor: instructor,
+            materialLink: materialLink
+        });
+
+        await newCourse.save();
+        res.status(201).send(`Success! ${courseCode} has been added to the LMS.`);
+        
+    } catch (error) {
+        res.status(500).send("Error uploading course: " + error.message);
+    }
+});
 
 app.listen (port,(()=>{
     console.log(`The port is running and listening on port ${port}`);

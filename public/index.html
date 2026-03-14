@@ -35,6 +35,24 @@
 
     <h2>VIP Area</h2>
     <button id="dashboardBtn">Enter VIP Dashboard</button>
+    <hr>
+    
+    <h2>👨‍🏫 Admin Portal: Course Upload</h2>
+    <form id="adminCourseForm">
+        <label>Course Code (e.g.,COSC301):</label><br>
+        <input type="text" id="courseCode" required><br><br>
+        
+        <label>Course Title:</label><br>
+        <input type="text" id="courseTitle" required><br><br>
+
+        <label>Instructor Name:</label><br>
+        <input type="text" id="instructorName" required><br><br>
+
+        <label>Cloud Folder Link (Google Drive/OneDrive):</label><br>
+        <input type="url" id="materialLink" required><br><br>
+        
+        <button type="submit">Publish Course</button>
+    </form>
 
     <script src="app.js"></script>
 </body>
