@@ -121,16 +121,18 @@ mongoose.connect(dbstring)
         })
 // ==========================================
 // ADMIN ROUTE: UPLOAD A COURSE
-// ==========================================
 app.post('/courses', async (req, res) => {
     try {
-        const { courseCode, title, instructor, materialLink } = req.body;
+        // Now grabbing all 3 links from the front-end
+        const { courseCode, title, instructor, previewLink, downloadLink, pqLink } = req.body;
 
         const newCourse = new Course({
             courseCode: courseCode,
             title: title,
             instructor: instructor,
-            materialLink: materialLink
+            previewLink: previewLink,
+            downloadLink: downloadLink,
+            pqLink: pqLink  // <-- Added PQ Link
         });
 
         await newCourse.save();

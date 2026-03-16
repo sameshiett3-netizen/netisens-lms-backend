@@ -79,9 +79,32 @@ document.getElementById('dashboardBtn').addEventListener('click', async () => {
 
         // 3. Read what the server says (Success or Failure)
         const result = await response.text();
-        alert(result);
+        alert(result)
 
     } catch (error) {
         alert("Server error connecting to the dashboard.");
+    }
+});
+document.getElementById('adminCourseForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); 
+
+    const courseCode = document.getElementById('courseCode').value;
+    const title = document.getElementById('courseTitle').value;
+    const instructor = document.getElementById('instructorName').value;
+    const previewLink = document.getElementById('previewLink').value; // Grabs Folder
+    const downloadLink = document.getElementById('downloadLink').value; // Grabs Download
+
+    try {
+        const response = await fetch('/courses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ courseCode, title, instructor, previewLink, downloadLink })
+        });
+
+        const result = await response.text();
+        alert(result);
+
+    } catch (error) {
+        alert("Server error uploading the course.");
     }
 });
