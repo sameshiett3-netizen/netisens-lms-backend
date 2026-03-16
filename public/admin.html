@@ -403,6 +403,48 @@
             </div>
         </div>
     </div>
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+            <span class="card-title">
+                <span class="card-title-dot"></span>
+                Add CBT Question
+            </span>
+        </div>
+
+        <form id="adminQuizForm">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Target Course Code</label>
+                    <input type="text" id="quizCourseCode" placeholder="e.g. COSC401" required>
+                </div>
+                <div class="form-group full">
+                    <label>Question Text</label>
+                    <input type="text" id="quizQuestion" placeholder="What is an Operating System?" required>
+                </div>
+                <div class="form-group">
+                    <label>Option A</label>
+                    <input type="text" id="optA" required>
+                </div>
+                <div class="form-group">
+                    <label>Option B</label>
+                    <input type="text" id="optB" required>
+                </div>
+                <div class="form-group">
+                    <label>Option C</label>
+                    <input type="text" id="optC" required>
+                </div>
+                <div class="form-group">
+                    <label>Option D</label>
+                    <input type="text" id="optD" required>
+                </div>
+                <div class="form-group full">
+                    <label>Correct Answer (A, B, C, or D)</label>
+                    <input type="text" id="correctAnswer" pattern="[A-Da-d]" title="Please enter A, B, C, or D" required style="text-transform: uppercase;">
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">✦ Add to Question Bank</button>
+        </form>
+    </div>
 
     <div class="footer-tag">Netisens LMS &nbsp;·&nbsp; Admin Console</div>
 

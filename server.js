@@ -10,7 +10,8 @@ const jwt = require ('jsonwebtoken')
 const User =require('./models/User')
 //initialise course information
 const Course = require('./models/Course');
-
+//initialise question information
+const Question = require('./models/Question')
 //initialise the server
 const app = express();
 //initialise the password encryptor
@@ -174,6 +175,30 @@ app.delete('/courses/:id', async (req, res) => {
         
     } catch (error) {
         res.status(500).send("Error deleting course: " + error.message);
+    }
+});
+// ==========================================
+// CBT ENGINE ROUTES
+// ==========================================
+// 1. Admin uploads a question
+app.post('/questions', async (req, res) => {
+    try {
+        const newQuestion = new Question(req.body);
+        await newQuestion.save();
+        res.status(201).send("Question successfully added to the CBT Bank!");
+    } catch (error) {
+        res.status(500).send("Error saving question: " + error.message);
+    }
+});
+
+// 2. Student fetches a test by Course Code
+app.get('/test/:courseCode', async (req, res) => {
+    try {
+        const courseCode = req.params.courseCode.toUpperCase();
+        const questions = await Question.find({ courseCode: courseCode });
+        res.status(200).json(questions);
+    } catch (error) {
+        res.status(500).send("Error fetching test: " + error.message);
     }
 });
 
