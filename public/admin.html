@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+</head>
+<body style="font-family: Arial; padding: 20px; max-width: 800px; margin: auto;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px;">
+        <h2>👨‍💻 Admin Portal: Course Upload</h2>
+        <a href="index.html"><button style="padding: 5px 15px; cursor: pointer; background: #dc3545; color: white; border: none;">Logout</button></a>
+    </div>
+
+    <form id="adminCourseForm" style="margin-top: 20px;">
+        <label>Course Code (e.g., COSC401):</label><br>
+        <input type="text" id="courseCode" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+
+        <label>Course Title:</label><br>
+        <input type="text" id="courseTitle" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+
+        <label>Instructor Name:</label><br>
+        <input type="text" id="instructorName" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+
+        <label>Course Folder Link (View Notes & PQs):</label><br>
+        <input type="url" id="previewLink" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+
+        <label>Fast Download Link (Main Note Only):</label><br>
+        <input type="url" id="downloadLink" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+
+        <label>Past Questions (Bulk ZIP Download Link):</label><br>
+        <input type="url" id="pqLink" required style="width: 100%; padding: 5px; margin-bottom: 20px;"><br>
+        
+        <button type="submit" style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">Publish Course</button>
+    </form>
+
+    <script src="app.js"></script>
+</body>
+</html>

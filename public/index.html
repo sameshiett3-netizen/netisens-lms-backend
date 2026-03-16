@@ -3,62 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netisens LMS</title>
+    <title>Netisens LMS - Login</title>
 </head>
-<body>
-    <h1>Netisens VIP Registration</h1>
-    <h2>Student Onboarding</h2>
-    
-    <form id="registerForm">
-        <label>Name:</label><br>
-        <input type="text" id="name" required><br><br>
-        
-        <label>Email:</label><br>
-        <input type="email" id="email" required><br><br>
-        
-        <label>Password:</label><br>
-        <input type="password" id="password" required><br><br>
-        
-        <button type="submit">Register Now</button>
-    </form>
-    <hr> <h2>Student Login</h2>
-    <form id="loginForm">
-        <label>Email:</label><br>
-        <input type="email" id="loginEmail" required><br><br>
-        
-        <label>Password:</label><br>
-        <input type="password" id="loginPassword" required><br><br>
-        
-        <button type="submit">Log In</button>
-    </form>
-    <hr>
+<body style="font-family: Arial, sans-serif; padding: 50px; max-width: 400px; margin: auto; background-color: #f4f4f9;">
 
-    <h2>VIP Area</h2>
-    <button id="dashboardBtn">Enter VIP Dashboard</button>
-    <hr>
-    
-    <h2>👨‍🏫 Admin Portal: Course Upload</h2>
-    <form id="adminCourseForm">
-        <label>Course Code (e.g.,COSC301):</label><br>
-        <input type="text" id="courseCode" required><br><br>
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center;">🎓 Netisens LMS Portal</h2>
         
-        <label>Course Title:</label><br>
-        <input type="text" id="courseTitle" required><br><br>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <button id="showLoginBtn" style="flex: 1; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;">Login</button>
+            <button id="showRegisterBtn" style="flex: 1; padding: 10px; background: #e2e3e5; color: black; border: none; cursor: pointer;">Sign Up</button>
+        </div>
 
-        <label>Instructor Name:</label><br>
-        <input type="text" id="instructorName" required><br><br>
-
-        <label>Course Folder Link (Notes & PQs):</label><br>
-        <input type="url" id="previewLink" required><br><br>
-
-        <label>Fast Download Link (Main Note Only):</label><br>
-        <input type="url" id="downloadLink" required><br><br>
-
-        <label>Past Questions (Bulk ZIP Download Link):</label><br>
-        <input type="url" id="pqLink" required><br><br>
-        
-        <button type="submit">Publish Course</button>
-    </form>
+        <form id="authForm">
+            <h3 id="formTitle">Secure Login</h3>
+            
+            <div id="nameBox" style="display: none;">
+                <label>Full Name:</label><br>
+                <input type="text" id="authName" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;"><br>
+            </div>
+            
+            <label>Email Address:</label><br>
+            <input type="email" id="authEmail" required style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;"><br>
+            
+            <label>Password:</label><br>
+            <input type="password" id="authPassword" required style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;"><br>
+            
+            <div style="text-align: right; margin-bottom: 15px;">
+                <a href="#" id="forgotPasswordLink" style="font-size: 12px; color: #007bff; text-decoration: none;">Forgot Password?</a>
+            </div>
+            
+            <button type="submit" id="submitBtn" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold;">Login to Dashboard</button>
+        </form>
+    </div>
 
     <script src="app.js"></script>
 </body>

@@ -45,6 +45,16 @@ app.use(express.static('public'))
         res.status(400).send("Registration failed. The email might already exist.");
     }
 });
+// STUDENT ROUTE: GET ALL COURSES
+app.get('/courses', async (req, res) => {
+    try {
+        // This tells MongoDB to find all courses and sort them newest first
+        const courses = await Course.find().sort({ createdAt: -1 }); 
+        res.status(200).json(courses);
+    } catch (error) {
+        res.status(500).send("Error fetching courses: " + error.message);
+    }
+});
 // The VIP Bouncer (Middleware)
 const verifyToken = (req, res, next) => {
     // 1. Look at the user's header for the wristband
