@@ -4,37 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Netisens LMS - Login</title>
-</head>
-<body style="font-family: Arial, sans-serif; padding: 50px; max-width: 400px; margin: auto; background-color: #f4f4f9;">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center;">🎓 Netisens LMS Portal</h2>
-        
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-            <button id="showLoginBtn" style="flex: 1; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;">Login</button>
-            <button id="showRegisterBtn" style="flex: 1; padding: 10px; background: #e2e3e5; color: black; border: none; cursor: pointer;">Sign Up</button>
+        :root {
+            --green-50:  #f0faf4;
+            --green-100: #d6f5e3;
+            --green-200: #aeebc8;
+            --green-300: #72d9a3;
+            --green-400: #3ec47e;
+            --green-500: #22a860;
+            --green-600: #1a8a4d;
+            --green-700: #156b3c;
+            --white:     #ffffff;
+            --surface:   #f7fdf9;
+            --border:    #d0eddc;
+            --text-dark: #0e2a1a;
+            --text-mid:  #2f6048;
+            --text-soft: #6aab84;
+            --shadow-sm: 0 1px 3px rgba(34,168,96,.08), 0 1px 2px rgba(34,168,96,.06);
+            --shadow-md: 0 4px 20px rgba(34,168,96,.10), 0 2px 8px rgba(34,168,96,.06);
+            --shadow-lg: 0 12px 40px rgba(34,168,96,.14), 0 4px 16px rgba(34,168,96,.08);
+            --radius:    16px;
+            --radius-sm: 8px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 10% 10%,  rgba(174,235,200,.45) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 90% 80%,  rgba(114,217,163,.30) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 50% 50%,  rgba(240,250,244,.80) 0%, transparent 80%);
+            pointer-events: none;
+            z-index: 0;
+            animation: meshDrift 14s ease-in-out infinite alternate;
+        }
+        @keyframes meshDrift {
+            from { opacity: .8; transform: scale(1); }
+            to   { opacity: 1; transform: scale(1.04); }
+        }
+
+        /* ── Card ── */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 32px 40px;
+            box-shadow: var(--shadow-lg);
+            animation: fadeUp .6s cubic-bezier(.22,.87,.36,1) both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Branding ── */
+        .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .brand-icon {
+            width: 54px; height: 54px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            border-radius: 16px;
+            display: inline-grid;
+            place-items: center;
+            font-size: 26px;
+            box-shadow: 0 6px 18px rgba(34,168,96,.32);
+            margin-bottom: 12px;
+        }
+        .brand-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        .brand-sub {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ── Tab switcher ── */
+        .tab-row {
+            display: flex;
+            background: var(--green-50);
+            border: 1.5px solid var(--green-100);
+            border-radius: var(--radius-sm);
+            padding: 4px;
+            margin-bottom: 26px;
+            gap: 4px;
+        }
+        .tab-row button {
+            flex: 1;
+            padding: 9px 10px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: .875rem;
+            cursor: pointer;
+            transition: background .2s, color .2s, box-shadow .2s, transform .15s;
+            letter-spacing: .02em;
+        }
+        #showLoginBtn {
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(34,168,96,.28);
+        }
+        #showRegisterBtn {
+            background: transparent;
+            color: var(--text-soft);
+        }
+        #showRegisterBtn:hover {
+            background: var(--white);
+            color: var(--text-mid);
+        }
+
+        /* ── Form title ── */
+        #formTitle {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #formTitle::before {
+            content: '';
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            flex-shrink: 0;
+        }
+
+        /* ── Form fields ── */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--green-50);
+            border: 1.5px solid var(--green-100);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        input:focus {
+            border-color: var(--green-400);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(62,196,126,.14);
+        }
+        input::placeholder { color: #a8c8b5; }
+
+        /* ── Forgot password ── */
+        .forgot-row {
+            text-align: right;
+            margin-top: -8px;
+            margin-bottom: 20px;
+        }
+        #forgotPasswordLink {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--green-500);
+            text-decoration: none;
+            letter-spacing: .02em;
+            transition: color .18s;
+        }
+        #forgotPasswordLink:hover { color: var(--green-700); }
+
+        /* ── Submit ── */
+        #submitBtn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: .95rem;
+            cursor: pointer;
+            letter-spacing: .03em;
+            box-shadow: 0 5px 18px rgba(34,168,96,.32);
+            position: relative;
+            overflow: hidden;
+            transition: transform .18s, box-shadow .18s;
+        }
+        #submitBtn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.18), transparent);
+            opacity: 0;
+            transition: opacity .2s;
+        }
+        #submitBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34,168,96,.40);
+        }
+        #submitBtn:hover::after { opacity: 1; }
+        #submitBtn:active { transform: translateY(0); }
+
+        /* ── Footer tag ── */
+        .footer-tag {
+            text-align: center;
+            margin-top: 24px;
+            font-size: .7rem;
+            color: var(--text-soft);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            opacity: .65;
+        }
+
+        /* ── nameBox hidden state ── */
+        #nameBox { display: none; }
+
+        @media (max-width: 460px) {
+            .card { padding: 28px 20px 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+
+        <div class="brand">
+            <div class="brand-icon">🎓</div>
+            <div class="brand-title">Netisens LMS Portal</div>
+            <div class="brand-sub">Learning Management System</div>
+        </div>
+
+        <div class="tab-row">
+            <button id="showLoginBtn">Login</button>
+            <button id="showRegisterBtn">Sign Up</button>
         </div>
 
         <form id="authForm">
             <h3 id="formTitle">Secure Login</h3>
-            
-            <div id="nameBox" style="display: none;">
-                <label>Full Name:</label><br>
-                <input type="text" id="authName" style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;"><br>
+
+            <div id="nameBox">
+                <div class="form-group">
+                    <label for="authName">Full Name</label>
+                    <input type="text" id="authName" placeholder="Jane Okafor">
+                </div>
             </div>
-            
-            <label>Email Address:</label><br>
-            <input type="email" id="authEmail" required style="width: 100%; padding: 8px; margin-bottom: 15px; box-sizing: border-box;"><br>
-            
-            <label>Password:</label><br>
-            <input type="password" id="authPassword" required style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box;"><br>
-            
-            <div style="text-align: right; margin-bottom: 15px;">
-                <a href="#" id="forgotPasswordLink" style="font-size: 12px; color: #007bff; text-decoration: none;">Forgot Password?</a>
+
+            <div class="form-group">
+                <label for="authEmail">Email Address</label>
+                <input type="email" id="authEmail" placeholder="you@example.com" required>
             </div>
-            
-            <button type="submit" id="submitBtn" style="width: 100%; padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; font-weight: bold;">Login to Dashboard</button>
+
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" placeholder="••••••••" required>
+            </div>
+
+            <div class="forgot-row">
+                <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+            </div>
+
+            <button type="submit" id="submitBtn">Login to Dashboard</button>
         </form>
+
+        <div class="footer-tag">Netisens LMS &nbsp;·&nbsp; Secure Access</div>
+
     </div>
 
     <script src="app.js"></script>

@@ -3,37 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal</title>
-</head>
-<body style="font-family: Arial; padding: 20px; max-width: 800px; margin: auto;">
+    <title>Admin Portal - Netisens LMS</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px;">
-        <h2>👨‍💻 Admin Portal: Course Upload</h2>
-        <a href="index.html"><button style="padding: 5px 15px; cursor: pointer; background: #dc3545; color: white; border: none;">Logout</button></a>
+        :root {
+            --green-50:  #f0faf4;
+            --green-100: #d6f5e3;
+            --green-200: #aeebc8;
+            --green-300: #72d9a3;
+            --green-400: #3ec47e;
+            --green-500: #22a860;
+            --green-600: #1a8a4d;
+            --green-700: #156b3c;
+            --white:     #ffffff;
+            --surface:   #f7fdf9;
+            --border:    #d0eddc;
+            --text-dark: #0e2a1a;
+            --text-mid:  #2f6048;
+            --text-soft: #6aab84;
+            --shadow-sm: 0 1px 3px rgba(34,168,96,.08), 0 1px 2px rgba(34,168,96,.06);
+            --shadow-md: 0 4px 20px rgba(34,168,96,.10), 0 2px 8px rgba(34,168,96,.06);
+            --shadow-lg: 0 12px 40px rgba(34,168,96,.14), 0 4px 16px rgba(34,168,96,.08);
+            --radius:    14px;
+            --radius-sm: 8px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Animated background mesh ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 10% 10%,  rgba(174,235,200,.45) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 90% 80%,  rgba(114,217,163,.30) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 50% 50%,  rgba(240,250,244,.80) 0%, transparent 80%);
+            pointer-events: none;
+            z-index: 0;
+            animation: meshDrift 14s ease-in-out infinite alternate;
+        }
+        @keyframes meshDrift {
+            from { opacity: .8; transform: scale(1); }
+            to   { opacity: 1; transform: scale(1.04); }
+        }
+
+        /* ── Layout wrapper ── */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ── Floating header ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px 24px;
+            box-shadow: var(--shadow-md);
+            animation: slideDown .6s cubic-bezier(.22,.87,.36,1) both;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(34,168,96,.30);
+            flex-shrink: 0;
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        .header-sub {
+            font-size: .72rem;
+            color: var(--text-soft);
+            font-weight: 500;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            padding: 9px 20px;
+            background: linear-gradient(135deg, #ff5c6c, #e0263a);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: .85rem;
+            cursor: pointer;
+            letter-spacing: .02em;
+            box-shadow: 0 4px 14px rgba(220,53,69,.30);
+            transition: transform .18s, box-shadow .18s, filter .18s;
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220,53,69,.38);
+            filter: brightness(1.05);
+        }
+        .btn-logout:active { transform: translateY(0); }
+
+        /* ── Cards ── */
+        .card {
+            background: rgba(255,255,255,.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 28px 32px;
+            box-shadow: var(--shadow-md);
+            margin-top: 24px;
+            animation: fadeUp .55s cubic-bezier(.22,.87,.36,1) both;
+        }
+        .card:nth-of-type(2) { animation-delay: .1s; }
+        .card:nth-of-type(3) { animation-delay: .2s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1.5px solid var(--green-100);
+        }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            flex-shrink: 0;
+        }
+
+        /* ── Form grid ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: .78rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            letter-spacing: .04em;
+            text-transform: uppercase;
+        }
+
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--green-50);
+            border: 1.5px solid var(--green-100);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .9rem;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            border-color: var(--green-400);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(62,196,126,.14);
+        }
+        input::placeholder { color: #a8c8b5; }
+
+        .btn-submit {
+            margin-top: 22px;
+            padding: 13px 30px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: .95rem;
+            cursor: pointer;
+            letter-spacing: .03em;
+            box-shadow: 0 5px 18px rgba(34,168,96,.32);
+            position: relative;
+            overflow: hidden;
+            transition: transform .18s, box-shadow .18s;
+        }
+        .btn-submit::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.18), transparent);
+            opacity: 0;
+            transition: opacity .2s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34,168,96,.40);
+        }
+        .btn-submit:hover::after { opacity: 1; }
+        .btn-submit:active { transform: translateY(0); }
+
+        /* ── Load DB button ── */
+        .btn-load {
+            padding: 9px 20px;
+            background: var(--white);
+            color: var(--green-600);
+            border: 1.5px solid var(--green-300);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: background .18s, border-color .18s, transform .18s, box-shadow .18s;
+            white-space: nowrap;
+        }
+        .btn-load:hover {
+            background: var(--green-50);
+            border-color: var(--green-400);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* ── Course list container ── */
+        #adminCourseList {
+            margin-top: 6px;
+            min-height: 48px;
+        }
+
+        /* ── Decorative bottom tag ── */
+        .footer-tag {
+            text-align: center;
+            margin-top: 40px;
+            font-size: .72rem;
+            color: var(--text-soft);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            opacity: .7;
+        }
+
+        /* ── Shimmer pulse (empty state visual) ── */
+        .empty-state {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-soft);
+            font-size: .88rem;
+            padding: 10px 0;
+        }
+        .empty-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green-300);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        .empty-dot:nth-child(2) { animation-delay: .25s; }
+        .empty-dot:nth-child(3) { animation-delay: .5s; }
+        @keyframes pulse {
+            0%, 100% { opacity: .3; transform: scale(.9); }
+            50%       { opacity: 1;  transform: scale(1.2); }
+        }
+
+        @media (max-width: 540px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: 1; }
+            .card { padding: 20px 18px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="header-icon">👨‍🏫</div>
+            <div>
+                <div class="header-title">Admin Portal</div>
+                <div class="header-sub">Netisens LMS</div>
+            </div>
+        </div>
+        <button id="logoutBtn" class="btn-logout">Logout</button>
     </div>
 
-    <form id="adminCourseForm" style="margin-top: 20px;">
-        <label>Course Code (e.g., COSC401):</label><br>
-        <input type="text" id="courseCode" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+    <!-- Upload Card -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">
+                <span class="card-title-dot"></span>
+                Upload New Course
+            </span>
+        </div>
 
-        <label>Course Title:</label><br>
-        <input type="text" id="courseTitle" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+        <form id="adminCourseForm">
+            <div class="form-grid">
 
-        <label>Instructor Name:</label><br>
-        <input type="text" id="instructorName" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+                <div class="form-group">
+                    <label for="courseCode">Course Code</label>
+                    <input type="text" id="courseCode" placeholder="e.g. COSC401" required>
+                </div>
 
-        <label>Course Folder Link (View Notes & PQs):</label><br>
-        <input type="url" id="previewLink" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+                <div class="form-group">
+                    <label for="courseTitle">Course Title</label>
+                    <input type="text" id="courseTitle" placeholder="Introduction to Algorithms" required>
+                </div>
 
-        <label>Fast Download Link (Main Note Only):</label><br>
-        <input type="url" id="downloadLink" required style="width: 100%; padding: 5px; margin-bottom: 10px;"><br>
+                <div class="form-group full">
+                    <label for="instructorName">Instructor Name</label>
+                    <input type="text" id="instructorName" placeholder="Dr. Jane Okafor" required>
+                </div>
 
-        <label>Past Questions (Bulk ZIP Download Link):</label><br>
-        <input type="url" id="pqLink" required style="width: 100%; padding: 5px; margin-bottom: 20px;"><br>
-        
-        <button type="submit" style="padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer;">Publish Course</button>
-    </form>
+                <div class="form-group full">
+                    <label for="previewLink">Course Folder Link (Notes &amp; PQs)</label>
+                    <input type="url" id="previewLink" placeholder="https://drive.google.com/…" required>
+                </div>
 
-    <script src="app.js"></script>
+                <div class="form-group">
+                    <label for="downloadLink">Fast Download Link</label>
+                    <input type="url" id="downloadLink" placeholder="https://…" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pqLink">Past Questions ZIP Link</label>
+                    <input type="url" id="pqLink" placeholder="https://…" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">✦ Publish Course</button>
+        </form>
+    </div>
+
+    <!-- Manage Card -->
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">
+                <span class="card-title-dot"></span>
+                Manage Existing Courses
+            </span>
+            <button id="loadAdminCoursesBtn" class="btn-load">⟳ Load Database</button>
+        </div>
+
+        <div id="adminCourseList">
+            <div class="empty-state">
+                <span class="empty-dot"></span>
+                <span class="empty-dot"></span>
+                <span class="empty-dot"></span>
+                <span>Awaiting database load…</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-tag">Netisens LMS &nbsp;·&nbsp; Admin Console</div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

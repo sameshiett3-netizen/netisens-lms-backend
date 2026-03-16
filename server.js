@@ -153,6 +153,30 @@ app.post('/courses', async (req, res) => {
     }
 });
 
+// ==========================================
+// ADMIN ROUTE: DELETE A COURSE
+// ==========================================
+app.delete('/courses/:id', async (req, res) => {
+    try {
+        // 1. Grab the unique ID from the URL
+        const courseId = req.params.id;
+
+        // 2. Tell MongoDB to find this exact course and wipe it out
+        const deletedCourse = await Course.findByIdAndDelete(courseId);
+
+        // 3. If the database couldn't find it, let us know
+        if (!deletedCourse) {
+            return res.status(404).send("Course not found in the database.");
+        }
+
+        // 4. Success message
+        res.status(200).send(`Success! ${deletedCourse.courseCode} has been permanently deleted.`);
+        
+    } catch (error) {
+        res.status(500).send("Error deleting course: " + error.message);
+    }
+});
+
 app.listen (port,(()=>{
     console.log(`The port is running and listening on port ${port}`);
 

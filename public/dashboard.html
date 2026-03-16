@@ -4,18 +4,256 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
-</head>
-<body style="font-family: Arial; padding: 20px; max-width: 800px; margin: auto;">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ccc; padding-bottom: 10px;">
-        <h2>📚 Student Dashboard</h2>
-        <a href="index.html"><button style="padding: 5px 15px; cursor: pointer; background: #dc3545; color: white; border: none;">Logout</button></a>
+        :root {
+            --green-50:  #f0faf4;
+            --green-100: #d6f5e3;
+            --green-200: #aeebc8;
+            --green-300: #72d9a3;
+            --green-400: #3ec47e;
+            --green-500: #22a860;
+            --green-600: #1a8a4d;
+            --green-700: #156b3c;
+            --white:     #ffffff;
+            --surface:   #f7fdf9;
+            --border:    #d0eddc;
+            --text-dark: #0e2a1a;
+            --text-mid:  #2f6048;
+            --text-soft: #6aab84;
+            --shadow-sm: 0 1px 3px rgba(34,168,96,.08), 0 1px 2px rgba(34,168,96,.06);
+            --shadow-md: 0 4px 20px rgba(34,168,96,.10), 0 2px 8px rgba(34,168,96,.06);
+            --shadow-lg: 0 12px 40px rgba(34,168,96,.14), 0 4px 16px rgba(34,168,96,.08);
+            --radius:    14px;
+            --radius-sm: 8px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 10% 10%,  rgba(174,235,200,.45) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 90% 80%,  rgba(114,217,163,.30) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 50% 50%,  rgba(240,250,244,.80) 0%, transparent 80%);
+            pointer-events: none;
+            z-index: 0;
+            animation: meshDrift 14s ease-in-out infinite alternate;
+        }
+        @keyframes meshDrift {
+            from { opacity: .8; transform: scale(1); }
+            to   { opacity: 1; transform: scale(1.04); }
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 16px 24px;
+            box-shadow: var(--shadow-md);
+            animation: slideDown .6s cubic-bezier(.22,.87,.36,1) both;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(34,168,96,.30);
+            flex-shrink: 0;
+        }
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+        }
+        .header-sub {
+            font-size: .72rem;
+            color: var(--text-soft);
+            font-weight: 500;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            padding: 9px 20px;
+            background: linear-gradient(135deg, #ff5c6c, #e0263a);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: .85rem;
+            cursor: pointer;
+            letter-spacing: .02em;
+            box-shadow: 0 4px 14px rgba(220,53,69,.30);
+            transition: transform .18s, box-shadow .18s, filter .18s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220,53,69,.38);
+            filter: brightness(1.05);
+        }
+        .btn-logout:active { transform: translateY(0); }
+
+        /* ── Load button ── */
+        .load-row {
+            margin-top: 24px;
+            animation: fadeUp .55s cubic-bezier(.22,.87,.36,1) .08s both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        #loadCoursesBtn {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--green-400), var(--green-600));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: .92rem;
+            cursor: pointer;
+            letter-spacing: .03em;
+            box-shadow: 0 5px 18px rgba(34,168,96,.32);
+            position: relative;
+            overflow: hidden;
+            transition: transform .18s, box-shadow .18s;
+        }
+        #loadCoursesBtn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,.18), transparent);
+            opacity: 0;
+            transition: opacity .2s;
+        }
+        #loadCoursesBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(34,168,96,.40);
+        }
+        #loadCoursesBtn:hover::after { opacity: 1; }
+        #loadCoursesBtn:active { transform: translateY(0); }
+
+        /* ── Course list container ── */
+        #courseList {
+            margin-top: 20px;
+            animation: fadeUp .55s cubic-bezier(.22,.87,.36,1) .16s both;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-soft);
+            font-size: .88rem;
+            padding: 10px 0;
+        }
+        .empty-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green-300);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        .empty-dot:nth-child(2) { animation-delay: .25s; }
+        .empty-dot:nth-child(3) { animation-delay: .5s; }
+        @keyframes pulse {
+            0%, 100% { opacity: .3; transform: scale(.9); }
+            50%       { opacity: 1;  transform: scale(1.2); }
+        }
+
+        /* ── Footer tag ── */
+        .footer-tag {
+            text-align: center;
+            margin-top: 40px;
+            font-size: .72rem;
+            color: var(--text-soft);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            opacity: .7;
+        }
+
+        @media (max-width: 520px) {
+            .header { padding: 14px 16px; }
+            .header-title { font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div class="header">
+        <div class="header-left">
+            <div class="header-icon">📚</div>
+            <div>
+                <div class="header-title">Student Dashboard</div>
+                <div class="header-sub">Netisens LMS</div>
+            </div>
+        </div>
+        <a href="index.html" style="text-decoration:none;">
+            <button class="btn-logout">Logout</button>
+        </a>
     </div>
 
-    <button id="loadCoursesBtn" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer;">Load My Courses</button>
-    
-    <div id="courseList" style="margin-top: 20px;"></div>
+    <div class="load-row">
+        <button id="loadCoursesBtn">⟳ Load My Courses</button>
+    </div>
 
-    <script src="app.js"></script>
+    <div id="courseList">
+        <div class="empty-state">
+            <span class="empty-dot"></span>
+            <span class="empty-dot"></span>
+            <span class="empty-dot"></span>
+            <span>Click Load My Courses to get started…</span>
+        </div>
+    </div>
+
+    <div class="footer-tag">Netisens LMS &nbsp;·&nbsp; Student Portal</div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
