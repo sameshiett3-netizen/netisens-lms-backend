@@ -209,11 +209,19 @@ app.post('/questions/bulk', async (req, res) => {
     }
 });
 
-// 2. Student fetches a test by Course Code
+// 2. Student fetches a RANDOMIZED test by Course Code
 app.get('/test/:courseCode', async (req, res) => {
     try {
         const courseCode = req.params.courseCode.toUpperCase();
-        const questions = await Question.find({ courseCode: courseCode });
+        // Look for the requested amount in the URL, default to 10 if not provided
+        const amount = parseInt(req.query.amount) || 10; 
+
+        // THE MAGIC: Use MongoDB Aggregation to get a RANDOM sample of questions!
+        const questions = await Question.aggregate([
+            { $match: { courseCode: courseCode } }, // Step 1: Filter by course
+            { $sample: { size: amount } }           // Step 2: Pick X random questions
+        ]);
+
         res.status(200).json(questions);
     } catch (error) {
         res.status(500).send("Error fetching test: " + error.message);

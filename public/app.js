@@ -340,16 +340,20 @@ if (document.getElementById('bulkQuizForm')) {
     });
 }
 
-// --- STUDENT: Fetch and Take the Test ---
+// --- STUDENT: Fetch and Take the Test (With Timer) ---
 if (document.getElementById('startTestBtn')) {
-    let currentQuizData = []; // Store the correct answers in memory
+    let currentQuizData = []; 
+    let countdownInterval; // Variable to hold our timer
 
     document.getElementById('startTestBtn').addEventListener('click', async () => {
         const code = document.getElementById('testCourseCode').value.trim();
+        const amount = document.getElementById('questionCount').value; // Get the selected number
+        
         if (!code) return alert("Please enter a course code first.");
 
         try {
-            const response = await fetch(`/test/${code}`);
+            // Notice how we attach ?amount= to the URL to tell the backend how many we want
+            const response = await fetch(`/test/${code}?amount=${amount}`);
             const questions = await response.json();
             const testArea = document.getElementById('testArea');
 
@@ -358,29 +362,64 @@ if (document.getElementById('startTestBtn')) {
                 return;
             }
 
-            currentQuizData = questions; // Save for grading
-            let quizHTML = `<form id="studentQuizForm" style="background: rgba(255,255,255,.88); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);">`;
+            currentQuizData = questions; 
+            
+            // Calculate time: 1 minute per question (converted to seconds)
+            let timeLeft = amount * 60; 
+
+            // Build the UI with a "Sticky" Floating Timer
+            let quizHTML = `
+                <div style="position: sticky; top: 20px; background: linear-gradient(135deg, #ff5c6c, #e0263a); color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; text-align: center; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(220,53,69,.3); z-index: 100; font-family: monospace; font-size: 1.2rem; letter-spacing: 2px;">
+                    ⏳ <span id="timerDisplay">--:--</span>
+                </div>
+                <form id="studentQuizForm" style="background: rgba(255,255,255,.88); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);">
+            `;
             
             questions.forEach((q, index) => {
                 quizHTML += `
                     <div style="margin-bottom: 20px; border-bottom: 1px solid var(--green-50); padding-bottom: 15px;">
                         <p style="font-weight: bold; color: var(--text-dark); margin-bottom: 10px;">${index + 1}. ${q.questionText}</p>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="color: var(--text-mid); text-transform: none; font-weight: normal;"><input type="radio" name="q${index}" value="A" required> A) ${q.optionA}</label>
-                            <label style="color: var(--text-mid); text-transform: none; font-weight: normal;"><input type="radio" name="q${index}" value="B"> B) ${q.optionB}</label>
-                            <label style="color: var(--text-mid); text-transform: none; font-weight: normal;"><input type="radio" name="q${index}" value="C"> C) ${q.optionC}</label>
-                            <label style="color: var(--text-mid); text-transform: none; font-weight: normal;"><input type="radio" name="q${index}" value="D"> D) ${q.optionD}</label>
+                            <label style="color: var(--text-mid); font-weight: normal; cursor: pointer;"><input type="radio" name="q${index}" value="A" required> A) ${q.optionA}</label>
+                            <label style="color: var(--text-mid); font-weight: normal; cursor: pointer;"><input type="radio" name="q${index}" value="B"> B) ${q.optionB}</label>
+                            <label style="color: var(--text-mid); font-weight: normal; cursor: pointer;"><input type="radio" name="q${index}" value="C"> C) ${q.optionC}</label>
+                            <label style="color: var(--text-mid); font-weight: normal; cursor: pointer;"><input type="radio" name="q${index}" value="D"> D) ${q.optionD}</label>
                         </div>
                     </div>
                 `;
             });
 
-            quizHTML += `<button type="submit" class="btn-submit" style="width: 100%;">Submit Test & Get Score</button></form>`;
+            quizHTML += `<button type="submit" id="submitExamBtn" class="btn-submit" style="width: 100%;">Submit Test & Get Score</button></form>`;
             testArea.innerHTML = quizHTML;
 
-            // Handle the submission and grading
+            // --- TIMER LOGIC ---
+            const timerDisplay = document.getElementById('timerDisplay');
+            clearInterval(countdownInterval); // Clear any old timers if they click start twice
+
+            countdownInterval = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                
+                // Add a leading zero if seconds are below 10 (e.g. 9 becomes 09)
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerDisplay.innerText = `${minutes}:${seconds}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval); // Stop the clock
+                    alert("Time is up! Your test will now auto-submit.");
+                    
+                    // Force the form to submit automatically!
+                    document.getElementById('submitExamBtn').click(); 
+                }
+                timeLeft--;
+            }, 1000); // Run this every 1000 milliseconds (1 second)
+
+
+            // --- GRADING LOGIC ---
             document.getElementById('studentQuizForm').addEventListener('submit', (e) => {
                 e.preventDefault();
+                clearInterval(countdownInterval); // Immediately stop the timer when they submit!
+                
                 let score = 0;
                 const formData = new FormData(e.target);
                 
@@ -392,11 +431,19 @@ if (document.getElementById('startTestBtn')) {
                 });
 
                 const percentage = Math.round((score / currentQuizData.length) * 100);
+                
+                // Change color based on pass/fail (50% passing grade)
+                const scoreColor = percentage >= 50 ? 'var(--green-600)' : '#e0263a';
+                const scoreBg = percentage >= 50 ? 'var(--green-50)' : '#fff0f1';
+                const scoreBorder = percentage >= 50 ? 'var(--green-400)' : '#ffb3b9';
+                const message = percentage >= 50 ? 'Great job!' : 'Keep studying, you will get it next time!';
+
                 testArea.innerHTML = `
-                    <div style="background: var(--green-50); border: 2px solid var(--green-400); border-radius: var(--radius); padding: 30px; text-align: center;">
+                    <div style="background: ${scoreBg}; border: 2px solid ${scoreBorder}; border-radius: var(--radius); padding: 30px; text-align: center; animation: fadeUp .5s ease both;">
                         <h2 style="color: var(--text-dark); margin-bottom: 10px;">Test Complete!</h2>
-                        <h1 style="color: var(--green-600); font-size: 3rem; margin: 0;">${percentage}%</h1>
-                        <p style="color: var(--text-mid); margin-top: 10px;">You scored ${score} out of ${currentQuizData.length} correctly.</p>
+                        <h1 style="color: ${scoreColor}; font-size: 3.5rem; margin: 0;">${percentage}%</h1>
+                        <p style="color: var(--text-mid); margin-top: 10px; font-weight: bold;">You scored ${score} out of ${currentQuizData.length} correctly.</p>
+                        <p style="color: var(--text-soft); font-size: 0.9rem; margin-top: 5px;">${message}</p>
                     </div>
                 `;
             });
