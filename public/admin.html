@@ -445,6 +445,32 @@
             <button type="submit" class="btn-submit">✦ Add to Question Bank</button>
         </form>
     </div>
+    <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+            <span class="card-title">
+                <span class="card-title-dot"></span>
+                Bulk Import Questions (JSON)
+            </span>
+        </div>
+
+        <form id="bulkQuizForm">
+            <div class="form-group full">
+                <label>Paste JSON Array from NotebookLM</label>
+                <textarea id="bulkJsonInput" rows="12" placeholder='[
+  {
+    "courseCode": "COSC401",
+    "questionText": "What is Linux?",
+    "optionA": "An OS",
+    "optionB": "A browser",
+    "optionC": "A game",
+    "optionD": "A fruit",
+    "correctAnswer": "A"
+  }
+]' required style="width: 100%; padding: 11px 14px; background: var(--green-50); border: 1.5px solid var(--green-100); border-radius: var(--radius-sm); font-family: monospace; font-size: .85rem; outline: none;"></textarea>
+            </div>
+            <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #007bff, #0056b3); box-shadow: 0 5px 18px rgba(0,123,255,.32);">✦ Run Bulk Import</button>
+        </form>
+    </div>
 
     <div class="footer-tag">Netisens LMS &nbsp;·&nbsp; Admin Console</div>
 

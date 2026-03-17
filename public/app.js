@@ -312,6 +312,34 @@ if (document.getElementById('adminQuizForm')) {
     });
 }
 
+// --- ADMIN: Bulk Import JSON Questions ---
+if (document.getElementById('bulkQuizForm')) {
+    document.getElementById('bulkQuizForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            // 1. Grab the raw text from the text area
+            const rawText = document.getElementById('bulkJsonInput').value;
+            
+            // 2. Try to parse it into actual JSON to make sure it's valid
+            const payload = JSON.parse(rawText);
+
+            // 3. Send the array to our new bulk route
+            const response = await fetch('/questions/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            alert(await response.text());
+            document.getElementById('bulkQuizForm').reset();
+            
+        } catch (error) {
+            // If JSON.parse fails, it means NotebookLM messed up the formatting
+            alert("Format Error: Ensure you are pasting a valid JSON array. Check for missing quotes or commas!");
+        }
+    });
+}
+
 // --- STUDENT: Fetch and Take the Test ---
 if (document.getElementById('startTestBtn')) {
     let currentQuizData = []; // Store the correct answers in memory

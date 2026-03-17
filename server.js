@@ -191,6 +191,24 @@ app.post('/questions', async (req, res) => {
     }
 });
 
+// Bulk upload multiple questions at once
+app.post('/questions/bulk', async (req, res) => {
+    try {
+        const questionsArray = req.body; // Expecting an array of questions
+        
+        // Safety check to ensure they actually sent an array
+        if (!Array.isArray(questionsArray)) {
+            return res.status(400).send("Error: Data must be a JSON array.");
+        }
+
+        // Mongoose command to insert multiple documents at once
+        await Question.insertMany(questionsArray);
+        res.status(201).send(`Massive Success! ${questionsArray.length} questions added to the Question Bank.`);
+    } catch (error) {
+        res.status(500).send("Error bulk saving questions: " + error.message);
+    }
+});
+
 // 2. Student fetches a test by Course Code
 app.get('/test/:courseCode', async (req, res) => {
     try {
